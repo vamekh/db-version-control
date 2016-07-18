@@ -7,7 +7,7 @@
 
     <groupId>ge.msda.commons</groupId>
     <artifactId>version-management-utils</artifactId>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -34,12 +34,12 @@
         <dependency>
             <groupId>ge.msda.clients</groupId>
             <artifactId>error-service</artifactId>
-            <version>0.0.8</version>
+            <version>0.1.5</version>
         </dependency>
         <dependency>
             <groupId>ge.msda.commons</groupId>
             <artifactId>api-utils</artifactId>
-            <version>0.1.4</version>
+            <version>0.1.9</version>
         </dependency>
     </dependencies>
 

@@ -1,12 +1,14 @@
 package ge.msda.commons.verssionmanagement.service;
 
 import ge.msda.clients.errorservice.ErrorService;
+import ge.msda.commons.apiutils.service.GeneralTools;
+import ge.msda.commons.rest.response.ResponseObject;
 import ge.msda.commons.verssionmanagement.constants.CommonConstants;
 import ge.msda.commons.verssionmanagement.entities.EntityWithArchive;
-import ge.msda.commons.rest.response.ResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
@@ -23,7 +25,6 @@ public class EntityWithArchiveService {
     @Autowired
     EntityManager em;
 
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public <R extends ge.msda.commons.verssionmanagement.repository.EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> List<T> save(List<T> newObjects, R repo, Date actionDate) throws ResponseObject {
         List<T> list = new ArrayList<>();
         for (T item : newObjects) {
@@ -66,15 +67,35 @@ public class EntityWithArchiveService {
         }
     }
 
+
+
+    @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
     private <R extends ge.msda.commons.verssionmanagement.repository.EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> T update(T newObject, R repo, Date actionDate) throws ResponseObject {
         em.detach(newObject);
+        T brandNew = GeneralTools.getCloneOf(newObject);
         T oldItem = repo.findCurrentVersion(newObject.getId(), actionDate);
         Tools.setHistoryFields(oldItem, newObject);
-        repo.save(oldItem);
-        em.flush();
-        newObject.setRecordId(null);
-        return repo.save(newObject);
+        repo.save(oldItem);/**/
+        //newObject.setRecordId(null);
+        brandNew.setRecordId(null);
+        return repo.save(brandNew);
+        //return repo.save(newObject);
+
+        //1 ივნისის
     }
+
+    /*//@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+    private <R extends ge.msda.commons.verssionmanagement.repository.EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> T update(T newObject, R repo, Date actionDate) throws ResponseObject {
+        em.detach(newObject);
+        T brandNew = GeneralTools.getCloneOf(newObject);
+        T oldItem = repo.findCurrentVersion(newObject.getId(), actionDate);
+        Tools.setHistoryFields(oldItem, brandNew);
+        brandNew.setRecordId(null);
+        //repo.save(oldItem);
+        return repo.save(brandNew);
+
+        // 1 ივნისის შემდგომი ვერსია
+    }*/
 
     public <R extends ge.msda.commons.verssionmanagement.repository.EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> void delete(T updatedObject, R repo) throws ResponseObject {
         delete(updatedObject.getId(), repo, new Date());
