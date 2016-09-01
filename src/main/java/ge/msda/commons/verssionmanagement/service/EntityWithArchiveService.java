@@ -74,7 +74,7 @@ public class EntityWithArchiveService {
         em.detach(newObject);
         T brandNew = GeneralTools.getCloneOf(newObject);
         T oldItem = repo.findCurrentVersion(newObject.getId(), actionDate);
-        Tools.setHistoryFields(oldItem, newObject);
+        Tools.setHistoryFields(oldItem, brandNew);
         repo.save(oldItem);/**/
         //newObject.setRecordId(null);
         brandNew.setRecordId(null);
