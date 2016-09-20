@@ -1,5 +1,6 @@
 package ge.msda.commons.verssionmanagement.service;
 
+import ge.msda.commons.rest.request.ActionPerformer;
 import ge.msda.commons.verssionmanagement.constants.CommonConstants;
 import ge.msda.commons.verssionmanagement.entities.EntityWithArchive;
 
@@ -19,11 +20,13 @@ public class Tools {
         }
     }*/
 
-    public static <T extends EntityWithArchive> void setHistoryFields(T oldVersion, T newVersion) {
-        setHistoryFields(oldVersion, newVersion, new Date());
+    public static <T extends EntityWithArchive> void setHistoryFields(T oldVersion, T newVersion, ActionPerformer actionPerformer) {
+        setHistoryFields(oldVersion, newVersion, actionPerformer, new Date());
     }
 
-    public static <T extends EntityWithArchive> void setHistoryFields(T oldVersion, T newVersion, Date versionChangeDate) {
+    public static <T extends EntityWithArchive> void setHistoryFields(T oldVersion, T newVersion, ActionPerformer actionPerformer, Date versionChangeDate) {
+        newVersion.setActionPerformerUserId(actionPerformer.getUserId());
+        newVersion.setActionPerformerClientId(actionPerformer.getClientId());
         if (versionChangeDate == null) {
             versionChangeDate = new Date();
         }

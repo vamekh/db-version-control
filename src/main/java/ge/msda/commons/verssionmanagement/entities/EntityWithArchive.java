@@ -8,8 +8,8 @@ import java.util.Date;
 
 @MappedSuperclass
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"ID", "TO_DATE"})})
 public abstract class EntityWithArchive<ID> implements EntityWithArchivePrimaryKey<ID> {
-
 
 
     @JsonIgnore
@@ -22,11 +22,11 @@ public abstract class EntityWithArchive<ID> implements EntityWithArchivePrimaryK
     @Temporal(TemporalType.TIMESTAMP)
     private Date toDate = CommonConstants.FAR_FUTURE_DATE;
 
-    @Column(name = "CREATED_BY")
-    private Long createdBy;
+    @Column(name = "ACTION_PERFORMER_USER_ID")
+    private Long actionPerformerUserId;
 
-    @Column(name = "UPDATED_BY")
-    private Long updatedBy;
+    @Column(name = "ACTION_PERFORMER_CLIENT_ID")
+    private Long actionPerformerClientId;
 
     /*----------------------------*/
 
@@ -46,19 +46,19 @@ public abstract class EntityWithArchive<ID> implements EntityWithArchivePrimaryK
         this.toDate = toDate;
     }
 
-    public Long getCreatedBy() {
-        return createdBy;
+    public Long getActionPerformerUserId() {
+        return actionPerformerUserId;
     }
 
-    public void setCreatedBy(Long createdBy) {
-        this.createdBy = createdBy;
+    public void setActionPerformerUserId(Long actionPerformerUserId) {
+        this.actionPerformerUserId = actionPerformerUserId;
     }
 
-    public Long getUpdatedBy() {
-        return updatedBy;
+    public Long getActionPerformerClientId() {
+        return actionPerformerClientId;
     }
 
-    public void setUpdatedBy(Long updatedBy) {
-        this.updatedBy = updatedBy;
+    public void setActionPerformerClientId(Long actionPerformerClientId) {
+        this.actionPerformerClientId = actionPerformerClientId;
     }
 }
