@@ -69,35 +69,16 @@ public class EntityWithArchiveService {
         }
     }
 
-
-
     @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
     private <R extends EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> T update(T newObject, R repo, ActionPerformer actionPerformer, Date actionDate) throws ResponseObject {
         em.detach(newObject);
         T brandNew = GeneralTools.getCloneOf(newObject);
         T oldItem = repo.findCurrentVersion(newObject.getId(), actionDate);
         Tools.setHistoryFields(oldItem, brandNew, actionPerformer);
-        repo.save(oldItem);/**/
-        //newObject.setRecordId(null);
+        repo.save(oldItem);
         brandNew.setRecordId(null);
         return repo.save(brandNew);
-        //return repo.save(newObject);
-
-        //1 ივნისის
     }
-
-    /*//@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-    private <R extends EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> T update(T newObject, R repo, Date actionDate) throws ResponseObject {
-        em.detach(newObject);
-        T brandNew = GeneralTools.getCloneOf(newObject);
-        T oldItem = repo.findCurrentVersion(newObject.getId(), actionDate);
-        Tools.setHistoryFields(oldItem, brandNew);
-        brandNew.setRecordId(null);
-        //repo.save(oldItem);
-        return repo.save(brandNew);
-
-        // 1 ივნისის შემდგომი ვერსია
-    }*/
 
     public <R extends EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> void delete(T updatedObject, R repo) throws ResponseObject {
         delete(updatedObject.getId(), repo, new Date());
@@ -124,6 +105,4 @@ public class EntityWithArchiveService {
     private <R extends EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> T findOne(ID id, R repo) throws ResponseObject {
         return repo.findCurrentVersion(id, new Date());
     }
-
-
 }
