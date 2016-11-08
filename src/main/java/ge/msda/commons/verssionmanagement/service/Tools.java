@@ -21,19 +21,22 @@ public class Tools {
     }*/
 
     public static <T extends EntityWithArchive> void setHistoryFields(T oldVersion, T newVersion, ActionPerformer actionPerformer) {
-        setHistoryFields(oldVersion, newVersion, actionPerformer, new Date());
-    }
-
-    public static <T extends EntityWithArchive> void setHistoryFields(T oldVersion, T newVersion, ActionPerformer actionPerformer, Date versionChangeDate) {
-        newVersion.setActionPerformerUserId(actionPerformer.getUserId());
-        newVersion.setActionPerformerClientId(actionPerformer.getClientId());
-        if (versionChangeDate == null) {
-            versionChangeDate = new Date();
+        newVersion.setActionPerformer(actionPerformer.toString());
+        if (actionPerformer.getDate() == null) {
+            actionPerformer.setDate(new Date());
         }
         if (oldVersion != null) {
-            oldVersion.setToDate(versionChangeDate);
+            oldVersion.setToDate(actionPerformer.getDate());
         }
-        newVersion.setFromDate(versionChangeDate);
+        newVersion.setFromDate(actionPerformer.getDate());
+        newVersion.setToDate(CommonConstants.FAR_FUTURE_DATE);
+    }
+    public static <T extends EntityWithArchive> void setHistoryFields(T newVersion, ActionPerformer actionPerformer) {
+        newVersion.setActionPerformer(actionPerformer.toString());
+        if (actionPerformer.getDate() == null) {
+            actionPerformer.setDate(new Date());
+        }
+        newVersion.setFromDate(actionPerformer.getDate());
         newVersion.setToDate(CommonConstants.FAR_FUTURE_DATE);
     }
 }

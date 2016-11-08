@@ -11,7 +11,6 @@ import java.util.Date;
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"ID", "TO_DATE"})})
 public abstract class EntityWithArchive<ID> implements EntityWithArchivePrimaryKey<ID> {
 
-
     @JsonIgnore
     @Column(name = "FROM_DATE", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -22,11 +21,9 @@ public abstract class EntityWithArchive<ID> implements EntityWithArchivePrimaryK
     @Temporal(TemporalType.TIMESTAMP)
     private Date toDate = CommonConstants.FAR_FUTURE_DATE;
 
-    @Column(name = "ACTION_PERFORMER_USER_ID")
-    private Long actionPerformerUserId;
-
-    @Column(name = "ACTION_PERFORMER_CLIENT_ID")
-    private Long actionPerformerClientId;
+    @JsonIgnore
+    @Column(name = "ACTION_PERFORMER")
+    private String actionPerformer;
 
     /*----------------------------*/
 
@@ -46,19 +43,11 @@ public abstract class EntityWithArchive<ID> implements EntityWithArchivePrimaryK
         this.toDate = toDate;
     }
 
-    public Long getActionPerformerUserId() {
-        return actionPerformerUserId;
+    public String getActionPerformer() {
+        return actionPerformer;
     }
 
-    public void setActionPerformerUserId(Long actionPerformerUserId) {
-        this.actionPerformerUserId = actionPerformerUserId;
-    }
-
-    public Long getActionPerformerClientId() {
-        return actionPerformerClientId;
-    }
-
-    public void setActionPerformerClientId(Long actionPerformerClientId) {
-        this.actionPerformerClientId = actionPerformerClientId;
+    public void setActionPerformer(String actionPerformer) {
+        this.actionPerformer = actionPerformer;
     }
 }

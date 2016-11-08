@@ -42,6 +42,11 @@
             <artifactId>error-service</artifactId>
             <version>0.1.9</version>
         </dependency>
+        <dependency>
+            <groupId>ge.msda.commons</groupId>
+            <artifactId>rest</artifactId>
+            <version>0.3.3</version>
+        </dependency>
     </dependencies>
 
 
