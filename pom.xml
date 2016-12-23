@@ -5,7 +5,7 @@
     <groupId>ge.msda.commons</groupId>
     <artifactId>version-management-utils</artifactId>
     <packaging>jar</packaging>
-    <version>0.0.7</version>
+    <version>0.0.9</version>
     <name>version-management-utils</name>
 
 
@@ -17,7 +17,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.4.0.RELEASE</version>
+        <version>1.4.2.RELEASE</version>
     </parent>
 
     <dependencies>
@@ -34,18 +34,18 @@
         <dependency>
             <groupId>ge.msda.commons</groupId>
             <artifactId>api-utils</artifactId>
-            <version>0.2.1</version>
+            <version>0.2.4</version>
         </dependency>
 
         <dependency>
             <groupId>ge.msda.clients</groupId>
             <artifactId>error-service</artifactId>
-            <version>0.1.9</version>
+            <version>0.2.0</version>
         </dependency>
         <dependency>
             <groupId>ge.msda.commons</groupId>
             <artifactId>rest</artifactId>
-            <version>0.3.3</version>
+            <version>0.3.7</version>
         </dependency>
     </dependencies>
 

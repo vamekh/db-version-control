@@ -25,6 +25,7 @@ public class EntityWithArchiveService {
     @Autowired
     EntityManager em;
 
+    @Transactional
     public <R extends EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> List<T> save(List<T> newObjects, ActionPerformer actionPerformer, R repo) throws ResponseObject {
         List<T> list = new ArrayList<>();
         for (T item : newObjects) {
