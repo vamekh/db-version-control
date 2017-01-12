@@ -17,6 +17,9 @@ public interface EntityWithArchiveRepository<T extends EntityWithArchive, ID ext
 
     String E_ACTION_DATE = " e.fromDate <= :actionDate AND e.toDate > :actionDate";
     String AND_E_ACTION_DATE = " AND" + E_ACTION_DATE;
+    String E_IN_INTERSECTION_FROM_DATE_TO_DATE = " e.fromDate <= :toDate AND e.toDate >= :fromDate";
+    String AND_E_IN_INTERSECTION_FROM_DATE_TO_DATE = " AND" + E_IN_INTERSECTION_FROM_DATE_TO_DATE;
+
 
 
     @Query(value = "FROM #{#entityName} e WHERE e.id = :itemId" + AND_E_ACTION_DATE)
