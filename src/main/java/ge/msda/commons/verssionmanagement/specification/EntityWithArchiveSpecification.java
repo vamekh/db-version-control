@@ -1,44 +1,35 @@
 package ge.msda.commons.verssionmanagement.specification;
 
 
-import ge.msda.api.fix.entity.BaseEntity;
-import ge.msda.api.fix.entity.Category;
 import ge.msda.commons.verssionmanagement.entities.EntityWithArchive;
 
-import javax.persistence.criteria.*;
-import java.util.List;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import java.util.Date;
+
 
 public class EntityWithArchiveSpecification {
 
-    public static Specification<EntityWithArchive> hasClientId(Long clientId) {
+    public static Specification<EntityWithArchive> isCurrentVersion(Date actionDate) {
         return new Specification<EntityWithArchive>() {
             @Override
             public Predicate toPredicate(Root<EntityWithArchive> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-
-                Predicate p1 = cb.greaterThanOrEqualTo(root.get("createdAt"), fromDate);
-                Predicate p2 = cb.lessThanOrEqualTo(root.get("createdAt"), toDate);
+                Predicate p1 = cb.lessThanOrEqualTo(root.get("fromDate"), actionDate);
+                Predicate p2 = cb.greaterThan(root.get("toDate"), actionDate);
                 return cb.and(p1, p2);
-
-                return cb.equal(root.get("clientId"), clientId);
             }
         };
     }
 
-    public static Specification<BaseEntity> hasRecordState(Integer recordState) {
-        return new Specification<BaseEntity>() {
+    public static Specification<EntityWithArchive> isIntersection(Date actionDate) {
+        return new Specification<EntityWithArchive>() {
             @Override
-            public Predicate toPredicate(Root<BaseEntity> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-                return cb.equal(root.get("recordState"), recordState);
-            }
-        };
-    }
-
-    public static Specification<BaseEntity> hasRecordStates(List<Integer> recordStates) {
-        return new Specification<BaseEntity>() {
-            @Override
-            public Predicate toPredicate(Root<BaseEntity> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-                Expression<Category> exp = root.get("recordState");
-                return exp.in(recordStates);
+            public Predicate toPredicate(Root<EntityWithArchive> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                Predicate p1 = cb.lessThanOrEqualTo(root.get("fromDate"), actionDate);
+                Predicate p2 = cb.greaterThanOrEqualTo(root.get("toDate"), actionDate);
+                return cb.and(p1, p2);
             }
         };
     }
