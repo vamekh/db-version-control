@@ -1,7 +1,6 @@
 package ge.msda.commons.verssionmanagement.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import ge.msda.commons.verssionmanagement.constants.CommonConstants;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -9,38 +8,45 @@ import java.util.Date;
 @MappedSuperclass
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"ID", "TO_DATE"})})
-public abstract class EntityWithArchive<ID> implements EntityWithArchivePrimaryKey<ID> {
+public abstract class EntityWithArchive<ID> /*implements EntityWithArchivePrimaryKey<ID> */{
 
     @JsonIgnore
-    @Column(name = "FROM_DATE", nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date fromDate = new Date();
+    @Column(name = "ROW_ID")
+    private ID rowId;
 
     @JsonIgnore
-    @Column(name = "TO_DATE", nullable = false)
+    @Column(name = "CREATED_AT", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date toDate = CommonConstants.FAR_FUTURE_DATE;
+    private Date cratedAt;
+
+    @JsonIgnore
+    @Column(name = "UPDATED_AT")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updatedAt;
 
     @JsonIgnore
     @Column(name = "ACTION_PERFORMER")
     private String actionPerformer;
 
+    abstract public ID getId();
+    abstract public void setId(ID id);
+
     /*----------------------------*/
 
-    public Date getFromDate() {
-        return fromDate;
+    public Date getCratedAt() {
+        return cratedAt;
     }
 
-    public void setFromDate(Date fromDate) {
-        this.fromDate = fromDate;
+    public void setCratedAt(Date cratedAt) {
+        this.cratedAt = cratedAt;
     }
 
-    public Date getToDate() {
-        return toDate;
+    public Date getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setToDate(Date toDate) {
-        this.toDate = toDate;
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public String getActionPerformer() {
@@ -49,5 +55,13 @@ public abstract class EntityWithArchive<ID> implements EntityWithArchivePrimaryK
 
     public void setActionPerformer(String actionPerformer) {
         this.actionPerformer = actionPerformer;
+    }
+
+    public ID getRowId() {
+        return rowId;
+    }
+
+    public void setRowId(ID rowId) {
+        this.rowId = rowId;
     }
 }

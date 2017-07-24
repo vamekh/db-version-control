@@ -1,9 +1,5 @@
 package ge.msda.commons.verssionmanagement.service;
 
-import ge.msda.clients.errorservice.ErrorService;
-import ge.msda.commons.apiutils.service.GeneralTools;
-import ge.msda.commons.rest.request.ActionPerformer;
-import ge.msda.commons.rest.response.ResponseObject;
 import ge.msda.commons.verssionmanagement.entities.EntityWithArchive;
 import ge.msda.commons.verssionmanagement.repository.EntityWithArchiveRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +9,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import javax.persistence.SequenceGenerator;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -24,9 +19,12 @@ public class EntityWithArchiveService {
 
     @Autowired
     EntityManager em;
+/*
+    @Autowired
+    SessionFactory sessionFactory;*/
 
     @Transactional
-    public <R extends EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> List<T> save(List<T> newObjects, ActionPerformer actionPerformer, R repo) throws ResponseObject {
+    public <R extends EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> List<T> save(List<T> newObjects, Object actionPerformer, R repo) {
         List<T> list = new ArrayList<>();
         for (T item : newObjects) {
             list.add(save(item, actionPerformer, repo));
@@ -34,7 +32,8 @@ public class EntityWithArchiveService {
         return list;
     }
 
-    public <R extends EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> T save(T newObject, ActionPerformer actionPerformer, R repo) throws ResponseObject {
+    public <R extends EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> T save(T newObject, Object actionPerformer, R repo) {
+        //ID id =(ID) sessionFactory.getClassMetadata(newObject.getClass()).getIdentifier(newObject, (SessionImplementor) sessionFactory.getCurrentSession());
         if (newObject.getId() == null) {
             return insert(newObject, actionPerformer, repo);
         } else {
@@ -42,49 +41,44 @@ public class EntityWithArchiveService {
         }
     }
 
-    private <R extends EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> T insert(T newObject, ActionPerformer actionPerformer, R repo) throws ResponseObject {
-        Long newId = getNewId(newObject);
-        newObject.setId((ID) newId);
-        newObject.setRecordId((ID) newId);
-        Tools.setHistoryFields(newObject, actionPerformer);
+    private <R extends EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> T insert(T newObject, Object actionPerformer, R repo) {
+        newObject.setRowId(null);
+        newObject.setCratedAt(new Date());
+        newObject.setActionPerformer(actionPerformer.toString());
+        newObject.setRowId(null);
+        newObject.setUpdatedAt(null);
         return repo.save(newObject);
-    }
-
-    public <R extends EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> T insertWithId(T newObject, ActionPerformer actionPerformer, R repo) throws ResponseObject {
-        Long newId = getNewId(newObject);
-        newObject.setRecordId((ID) newId);
-        Tools.setHistoryFields(newObject, actionPerformer);
-        return repo.save(newObject);
-    }
-
-    private <T extends EntityWithArchive<ID>, ID extends Serializable> Long getNewId(T newObject) throws ResponseObject {
-        try {
-            String sequenceName = newObject.getClass().getDeclaredField("recordId").getDeclaredAnnotation(SequenceGenerator.class).sequenceName();
-            return ((BigDecimal) em.createNativeQuery("SELECT " + sequenceName + ".nextval FROM DUAL").getSingleResult()).longValue();
-        } catch (Exception e) {
-            throw ErrorService.initializeErrorResponse("badEntityWithArchiveSequence");
-        }
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-    private <R extends EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> T update(T newObject, ActionPerformer actionPerformer, R repo) throws ResponseObject {
+    private <R extends EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> T update(T newObject, Object actionPerformer, R repo){
         em.detach(newObject);
-        T brandNew = GeneralTools.getCloneOf(newObject);
-        T oldItem = repo.findCurrentVersion(newObject.getId(), actionPerformer.getDate());
-        Tools.setHistoryFields(oldItem, brandNew, actionPerformer);
+        T oldItem = repo.findOne(newObject.getId());
+        em.detach(oldItem);
+
+        newObject.setCratedAt(new Date());
+        newObject.setActionPerformer(actionPerformer.toString());
+        oldItem.setRowId(oldItem.getId());
+        oldItem.setId(null);
+        oldItem.setUpdatedAt(newObject.getCratedAt());
+
         repo.save(oldItem);
-        brandNew.setRecordId(null);
-        return repo.save(brandNew);
+        return repo.save(newObject);
     }
 
-    public <R extends EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> void delete(T updatedObject, ActionPerformer actionPerformer, R repo) throws ResponseObject {
+    public <R extends EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> void delete(T updatedObject, Object actionPerformer, R repo) {
         delete(updatedObject.getId(), actionPerformer, repo);
     }
 
-    public <R extends EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> void delete(ID id, ActionPerformer actionPerformer, R repo) throws ResponseObject {
-        T currentVersion = repo.findCurrentVersion(id, actionPerformer.getDate());
-        currentVersion.setToDate(actionPerformer.getDate());
+    @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+    public <R extends EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> void delete(ID id, Object actionPerformer, R repo) {
+        T currentVersion = repo.findOne(id);
+        em.detach(currentVersion);
+        currentVersion.setRowId(currentVersion.getId());
+        currentVersion.setId(null);
+        currentVersion.setUpdatedAt(new Date());
         currentVersion.setActionPerformer(currentVersion.getActionPerformer() + " del> " + actionPerformer.toString());
+        repo.delete(currentVersion.getRowId());
         repo.save(currentVersion);
     }
 }
