@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
 
 import java.io.Serializable;
+import java.util.List;
 
 @NoRepositoryBean
 public interface EntityWithArchiveRepository<T extends EntityWithArchive, ID extends Serializable> extends JpaRepository<T, ID> {
@@ -21,6 +22,9 @@ public interface EntityWithArchiveRepository<T extends EntityWithArchive, ID ext
 /*
     @Query(value = "FROM #{#entityName} e WHERE e.id = :itemId" + AND_E_ACTION_DATE)
     T findCurrentVersion(@Param("itemId") ID id, @Param("actionDate") Date actionDate);*/
+
+    @Query(value = "FROM #{#entityName} e WHERE " + E_ACTIVE_ROWS)
+    List<T> findAll();
 
     @Query(value = "FROM #{#entityName} e WHERE " + E_ACTIVE_ROWS)
     Page<T> findAll(Pageable pageable);
