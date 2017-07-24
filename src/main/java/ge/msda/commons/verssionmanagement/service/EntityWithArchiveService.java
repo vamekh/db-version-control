@@ -1,10 +1,7 @@
 package ge.msda.commons.verssionmanagement.service;
 
-import ge.msda.clients.errorservice.ErrorService;
-import ge.msda.commons.apiutils.service.GeneralTools;
-import ge.msda.commons.rest.response.ResponseObject;
-import ge.msda.commons.verssionmanagement.constants.CommonConstants;
 import ge.msda.commons.verssionmanagement.entities.EntityWithArchive;
+import ge.msda.commons.verssionmanagement.repository.EntityWithArchiveRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -12,9 +9,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import javax.persistence.SequenceGenerator;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,102 +19,66 @@ public class EntityWithArchiveService {
 
     @Autowired
     EntityManager em;
+/*
+    @Autowired
+    SessionFactory sessionFactory;*/
 
-    public <R extends ge.msda.commons.verssionmanagement.repository.EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> List<T> save(List<T> newObjects, R repo, Date actionDate) throws ResponseObject {
+    @Transactional
+    public <R extends EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> List<T> save(List<T> newObjects, Object actionPerformer, R repo) {
         List<T> list = new ArrayList<>();
         for (T item : newObjects) {
-            list.add(save(item, repo, actionDate));
+            list.add(save(item, actionPerformer, repo));
         }
         return list;
     }
 
-    public <R extends ge.msda.commons.verssionmanagement.repository.EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> List<T> save(List<T> newObjects, R repo) throws ResponseObject {
-        return save(newObjects, repo, new Date());
-    }
-
-    public <R extends ge.msda.commons.verssionmanagement.repository.EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> T save(T newObject, R repo) throws ResponseObject {
-        return save(newObject, repo, new Date());
-    }
-
-    public <R extends ge.msda.commons.verssionmanagement.repository.EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> T save(T newObject, R repo, Date actionDate) throws ResponseObject {
+    public <R extends EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> T save(T newObject, Object actionPerformer, R repo) {
+        //ID id =(ID) sessionFactory.getClassMetadata(newObject.getClass()).getIdentifier(newObject, (SessionImplementor) sessionFactory.getCurrentSession());
         if (newObject.getId() == null) {
-            return insert(newObject, repo, actionDate);
+            return insert(newObject, actionPerformer, repo);
         } else {
-            return update(newObject, repo, actionDate);
+            return update(newObject, actionPerformer, repo);
         }
     }
 
-    private <R extends ge.msda.commons.verssionmanagement.repository.EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> T insert(T newObject, R repo, Date actionDate) throws ResponseObject {
-        Long newId = getNewId(newObject);
-        newObject.setId((ID) newId);
-        newObject.setRecordId((ID) newId);
-        newObject.setFromDate(actionDate);
-        newObject.setToDate(CommonConstants.FAR_FUTURE_DATE);
+    private <R extends EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> T insert(T newObject, Object actionPerformer, R repo) {
+        newObject.setRowId(null);
+        newObject.setCratedAt(new Date());
+        newObject.setActionPerformer(actionPerformer.toString());
+        newObject.setRowId(null);
+        newObject.setUpdatedAt(null);
         return repo.save(newObject);
     }
 
-    private <T extends EntityWithArchive<ID>, ID extends Serializable> Long getNewId(T newObject) throws ResponseObject {
-        try {
-            String sequenceName = newObject.getClass().getDeclaredField("recordId").getDeclaredAnnotation(SequenceGenerator.class).sequenceName();
-            return ((BigDecimal) em.createNativeQuery("SELECT " + sequenceName + ".nextval FROM DUAL").getSingleResult()).longValue();
-        } catch (Exception e) {
-            throw ErrorService.initializeErrorResponse("badEntityWithArchiveSequence");
-        }
+    @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+    private <R extends EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> T update(T newObject, Object actionPerformer, R repo){
+        em.detach(newObject);
+        T oldItem = repo.findOne(newObject.getId());
+        em.detach(oldItem);
+
+        newObject.setCratedAt(new Date());
+        newObject.setActionPerformer(actionPerformer.toString());
+        oldItem.setRowId(oldItem.getId());
+        oldItem.setId(null);
+        oldItem.setUpdatedAt(newObject.getCratedAt());
+
+        repo.save(oldItem);
+        return repo.save(newObject);
     }
 
-
+    public <R extends EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> void delete(T updatedObject, Object actionPerformer, R repo) {
+        delete(updatedObject.getId(), actionPerformer, repo);
+    }
 
     @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-    private <R extends ge.msda.commons.verssionmanagement.repository.EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> T update(T newObject, R repo, Date actionDate) throws ResponseObject {
-        em.detach(newObject);
-        T brandNew = GeneralTools.getCloneOf(newObject);
-        T oldItem = repo.findCurrentVersion(newObject.getId(), actionDate);
-        Tools.setHistoryFields(oldItem, brandNew);
-        repo.save(oldItem);/**/
-        //newObject.setRecordId(null);
-        brandNew.setRecordId(null);
-        return repo.save(brandNew);
-        //return repo.save(newObject);
-
-        //1 ივნისის
-    }
-
-    /*//@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-    private <R extends ge.msda.commons.verssionmanagement.repository.EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> T update(T newObject, R repo, Date actionDate) throws ResponseObject {
-        em.detach(newObject);
-        T brandNew = GeneralTools.getCloneOf(newObject);
-        T oldItem = repo.findCurrentVersion(newObject.getId(), actionDate);
-        Tools.setHistoryFields(oldItem, brandNew);
-        brandNew.setRecordId(null);
-        //repo.save(oldItem);
-        return repo.save(brandNew);
-
-        // 1 ივნისის შემდგომი ვერსია
-    }*/
-
-    public <R extends ge.msda.commons.verssionmanagement.repository.EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> void delete(T updatedObject, R repo) throws ResponseObject {
-        delete(updatedObject.getId(), repo, new Date());
-    }
-
-    public <R extends ge.msda.commons.verssionmanagement.repository.EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> void delete(ID id, R repo) throws ResponseObject {
-        delete(id, repo, new Date());
-    }
-
-    public <R extends ge.msda.commons.verssionmanagement.repository.EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> void delete(T updatedObject, R repo, Date actionDate) throws ResponseObject {
-        delete(updatedObject.getId(), repo, actionDate);
-    }
-
-    public <R extends ge.msda.commons.verssionmanagement.repository.EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> void delete(ID id, R repo, Date actionDate) throws ResponseObject {
-        T currentVersion = repo.findCurrentVersion(id, actionDate);
-        currentVersion.setToDate(actionDate);
+    public <R extends EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> void delete(ID id, Object actionPerformer, R repo) {
+        T currentVersion = repo.findOne(id);
+        em.detach(currentVersion);
+        currentVersion.setRowId(currentVersion.getId());
+        currentVersion.setId(null);
+        currentVersion.setUpdatedAt(new Date());
+        currentVersion.setActionPerformer(currentVersion.getActionPerformer() + " del> " + actionPerformer.toString());
+        repo.delete(currentVersion.getRowId());
         repo.save(currentVersion);
-    }
-
-    private <R extends ge.msda.commons.verssionmanagement.repository.EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> T findOne(ID id, R repo, Date actionDate) throws ResponseObject {
-        return repo.findCurrentVersion(id, actionDate);
-    }
-
-    private <R extends ge.msda.commons.verssionmanagement.repository.EntityWithArchiveRepository<T, ID>, T extends EntityWithArchive<ID>, ID extends Serializable> T findOne(ID id, R repo) throws ResponseObject {
-        return repo.findCurrentVersion(id, new Date());
     }
 }

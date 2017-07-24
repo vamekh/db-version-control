@@ -1,64 +1,67 @@
 package ge.msda.commons.verssionmanagement.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import ge.msda.commons.verssionmanagement.constants.CommonConstants;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @MappedSuperclass
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public abstract class EntityWithArchive<ID> implements EntityWithArchivePrimaryKey<ID> {
-
-
-
-    @JsonIgnore
-    @Column(name = "FROM_DATE", nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date fromDate = new Date();
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"ID", "TO_DATE"})})
+public abstract class EntityWithArchive<ID> /*implements EntityWithArchivePrimaryKey<ID> */{
 
     @JsonIgnore
-    @Column(name = "TO_DATE", nullable = false)
+    @Column(name = "ROW_ID")
+    private ID rowId;
+
+    @JsonIgnore
+    @Column(name = "CREATED_AT", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date toDate = CommonConstants.FAR_FUTURE_DATE;
+    private Date cratedAt;
 
-    @Column(name = "CREATED_BY")
-    private Long createdBy;
+    @JsonIgnore
+    @Column(name = "UPDATED_AT")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updatedAt;
 
-    @Column(name = "UPDATED_BY")
-    private Long updatedBy;
+    @JsonIgnore
+    @Column(name = "ACTION_PERFORMER")
+    private String actionPerformer;
+
+    abstract public ID getId();
+    abstract public void setId(ID id);
 
     /*----------------------------*/
 
-    public Date getFromDate() {
-        return fromDate;
+    public Date getCratedAt() {
+        return cratedAt;
     }
 
-    public void setFromDate(Date fromDate) {
-        this.fromDate = fromDate;
+    public void setCratedAt(Date cratedAt) {
+        this.cratedAt = cratedAt;
     }
 
-    public Date getToDate() {
-        return toDate;
+    public Date getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setToDate(Date toDate) {
-        this.toDate = toDate;
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
-    public Long getCreatedBy() {
-        return createdBy;
+    public String getActionPerformer() {
+        return actionPerformer;
     }
 
-    public void setCreatedBy(Long createdBy) {
-        this.createdBy = createdBy;
+    public void setActionPerformer(String actionPerformer) {
+        this.actionPerformer = actionPerformer;
     }
 
-    public Long getUpdatedBy() {
-        return updatedBy;
+    public ID getRowId() {
+        return rowId;
     }
 
-    public void setUpdatedBy(Long updatedBy) {
-        this.updatedBy = updatedBy;
+    public void setRowId(ID rowId) {
+        this.rowId = rowId;
     }
 }
