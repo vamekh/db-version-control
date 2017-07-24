@@ -16,8 +16,6 @@ public interface EntityWithArchiveRepository<T extends EntityWithArchive, ID ext
     String AND_E_ACTIVE_ROWS = " AND" + E_ACTIVE_ROWS;/*
     String E_IN_INTERSECTION_FROM_DATE_TO_DATE = " e.fromDate <= :toDate AND e.toDate >= :fromDate";
     String AND_E_IN_INTERSECTION_FROM_DATE_TO_DATE = " AND" + E_IN_INTERSECTION_FROM_DATE_TO_DATE;*/
-
-
 /*
     @Query(value = "FROM #{#entityName} e WHERE e.id = :itemId" + AND_E_ACTION_DATE)
     T findCurrentVersion(@Param("itemId") ID id, @Param("actionDate") Date actionDate);*/
