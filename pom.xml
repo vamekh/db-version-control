@@ -3,10 +3,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>ge.msda.commons</groupId>
-    <artifactId>version-management-utils</artifactId>
+    <artifactId>db-version-control</artifactId>
     <packaging>jar</packaging>
     <version>0.2.0</version>
-    <name>version-management-utils</name>
+    <name>DB Version Control</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
