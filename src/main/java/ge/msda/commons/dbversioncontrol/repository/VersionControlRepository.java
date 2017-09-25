@@ -1,6 +1,6 @@
-package ge.msda.commons.verssionmanagement.repository;
+package ge.msda.commons.dbversioncontrol.repository;
 
-import ge.msda.commons.verssionmanagement.entities.EntityWithArchive;
+import ge.msda.commons.dbversioncontrol.entities.EntityWithVersionControl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @NoRepositoryBean
-public interface EntityWithArchiveRepository<T extends EntityWithArchive, ID extends Serializable> extends JpaRepository<T, ID> {
+public interface VersionControlRepository<T extends EntityWithVersionControl, ID extends Serializable> extends JpaRepository<T, ID> {
 
     String E_ACTIVE_ROWS = " e.rowId is null";
     String AND_E_ACTIVE_ROWS = " AND" + E_ACTIVE_ROWS;

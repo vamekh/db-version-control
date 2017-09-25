@@ -1,4 +1,4 @@
-package ge.msda.commons.verssionmanagement.entities;
+package ge.msda.commons.dbversioncontrol.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -8,7 +8,7 @@ import java.util.Date;
 @MappedSuperclass
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"ID", "TO_DATE"})})
-public abstract class EntityWithArchive<ID> /*implements EntityWithArchivePrimaryKey<ID> */{
+public abstract class EntityWithVersionControl<ID> /*implements EntityWithArchivePrimaryKey<ID> */{
 
     @JsonIgnore
     @Column(name = "ROW_ID")
