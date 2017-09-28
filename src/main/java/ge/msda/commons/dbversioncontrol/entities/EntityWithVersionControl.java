@@ -17,7 +17,7 @@ public abstract class EntityWithVersionControl<ID> /*implements EntityWithArchiv
     @JsonIgnore
     @Column(name = "CREATED_AT", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date cratedAt;
+    private Date createdAt;
 
     @JsonIgnore
     @Column(name = "UPDATED_AT")
@@ -33,12 +33,12 @@ public abstract class EntityWithVersionControl<ID> /*implements EntityWithArchiv
 
     /*----------------------------*/
 
-    public Date getCratedAt() {
-        return cratedAt;
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCratedAt(Date cratedAt) {
-        this.cratedAt = cratedAt;
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 
     public Date getUpdatedAt() {

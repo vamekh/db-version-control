@@ -44,7 +44,7 @@ public class VersionControlService {
 
     private <R extends VersionControlRepository<T, ID>, T extends EntityWithVersionControl<ID>, ID extends Serializable> T insert(T newObject, Object actionPerformer, R repo) {
         newObject.setRowId(null);
-        newObject.setCratedAt(new Date());
+        newObject.setCreatedAt(new Date());
         newObject.setActionPerformer(actionPerformer.toString());
         newObject.setRowId(null);
         newObject.setUpdatedAt(null);
@@ -56,11 +56,11 @@ public class VersionControlService {
         T oldItem = repo.findOne(newObject.getId());
         em.detach(oldItem);
 
-        newObject.setCratedAt(new Date());
+        newObject.setCreatedAt(new Date());
         newObject.setActionPerformer(actionPerformer.toString());
         oldItem.setRowId(oldItem.getId());
         oldItem.setId(null);
-        oldItem.setUpdatedAt(newObject.getCratedAt());
+        oldItem.setUpdatedAt(newObject.getCreatedAt());
 
         repo.save(oldItem);
         return repo.save(newObject);
