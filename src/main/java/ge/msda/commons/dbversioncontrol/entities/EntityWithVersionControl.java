@@ -7,7 +7,6 @@ import java.util.Date;
 
 @MappedSuperclass
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"ID", "TO_DATE"})})
 public abstract class EntityWithVersionControl<ID> /*implements EntityWithArchivePrimaryKey<ID> */{
 
     @JsonIgnore

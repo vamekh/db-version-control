@@ -5,7 +5,7 @@
     <groupId>ge.msda.commons</groupId>
     <artifactId>db-version-control</artifactId>
     <packaging>jar</packaging>
-    <version>0.2.2</version>
+    <version>0.2.1</version>
     <name>DB Version Control</name>
 
     <properties>
