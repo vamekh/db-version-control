@@ -16,9 +16,12 @@ public interface VersionControlRepository<T extends EntityWithVersionControl, ID
     String E_ACTIVE_ROWS = " e.rowId is null";
     String AND_E_ACTIVE_ROWS = " AND" + E_ACTIVE_ROWS;
 
-    @Query(value = "FROM #{#entityName} e WHERE " + E_ACTIVE_ROWS)
+    @Query("FROM #{#entityName} e WHERE " + E_ACTIVE_ROWS)
     List<T> findAll();
 
-    @Query(value = "FROM #{#entityName} e WHERE " + E_ACTIVE_ROWS)
+    @Query("FROM #{#entityName} e WHERE " + E_ACTIVE_ROWS)
     Page<T> findAll(Pageable pageable);
+
+    @Query("FROM #{#entityName} e WHERE e.id = :id" + AND_E_ACTIVE_ROWS)
+    T findOne(ID id);
 }
