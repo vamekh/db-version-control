@@ -1,12 +1,14 @@
 package ge.msda.commons.dbversioncontrol.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @MappedSuperclass
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Where(clause = "ROW_ID IS NULL")
 public abstract class EntityWithVersionControl<ID> /*implements EntityWithArchivePrimaryKey<ID> */{
 
     @JsonIgnore
