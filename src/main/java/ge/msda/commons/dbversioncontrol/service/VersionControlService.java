@@ -9,7 +9,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -61,9 +64,26 @@ public class VersionControlService {
         oldItem.setRowId(oldItem.getId());
         oldItem.setId(null);
         oldItem.setUpdatedAt(newObject.getCreatedAt());
-
+        //repo.makeOldVerssion(oldItem.getId(), newObject.getCreatedAt());
+        cleanAssociations(oldItem);
         repo.save(oldItem);
         return repo.save(newObject);
+    }
+
+    private <T extends EntityWithVersionControl> void cleanAssociations(T object){
+        for(Field field : object.getClass().getDeclaredFields()){
+            if(field.isAnnotationPresent(OneToMany.class) || field.isAnnotationPresent(ManyToMany.class)){
+                boolean accessible = field.isAccessible();
+                field.setAccessible(true);
+                try {
+                    field.set(object, null);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }finally {
+                    field.setAccessible(accessible);
+                }
+            }
+        }
     }
 
     public <R extends VersionControlRepository<T, ID>, T extends EntityWithVersionControl<ID>, ID extends Serializable> void delete(T updatedObject, Object actionPerformer, R repo) {
