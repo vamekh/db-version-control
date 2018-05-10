@@ -5,7 +5,7 @@
     <groupId>ge.msda.commons</groupId>
     <artifactId>db-version-control</artifactId>
     <packaging>jar</packaging>
-    <version>0.2.3</version>
+    <version>0.2.4</version>
     <name>DB Version Control</name>
 
     <properties>
@@ -60,6 +60,33 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.bsc.maven</groupId>
+                <artifactId>maven-processor-plugin</artifactId>
+                <version>2.2.4</version>
+                <executions>
+                    <execution>
+                        <id>process</id>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <processors>
+                                <processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor>
+                            </processors>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.hibernate</groupId>
+                        <artifactId>hibernate-jpamodelgen</artifactId>
+                        <version>4.3.8.Final</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
         <extensions>
